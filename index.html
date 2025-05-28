@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>News App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    #searchForm {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    #searchInput {
+      padding: 10px;
+      width: 70%;
+      border: 1px solid #ccc;
+      border-radius: 5px 0 0 5px;
+    }
+    #searchBtn {
+      padding: 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+    }
+    #newsContainer {
+      display: grid;
+      gap: 20px;
+    }
+    .news-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .news-card h3 {
+      margin: 0 0 10px;
+    }
+    .news-card a {
+      text-decoration: none;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>News App</h1>
+    <form id="searchForm">
+      <input type="text" id="searchInput" placeholder="Enter topic e.g. India, tech..." required />
+      <button type="submit" id="searchBtn">Search</button>
+    </form>
+    <div id="newsContainer"></div>
+  </div>
+
+  <script>
+    const apiKey = "87af437c289548748115a30c5784fb44";
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('searchInput');
+    const newsContainer = document.getElementById('newsContainer');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const query = input.value.trim();
+      if (!query) return;
+      
+      newsContainer.innerHTML = "<p>Loading...</p>";
+      
+      try {
+        const response = await fetch(
+          `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${apiKey}`
+        );
+        const data = await response.json();
+        
+        if (data.articles && data.articles.length > 0) {
+          newsContainer.innerHTML = data.articles.map(article => `
+            <div class="news-card">
+              <h3>${article.title}</h3>
+              <p>${article.description || 'No description available.'}</p>
+              <a href="${article.url}" target="_blank">Read more</a>
+            </div>
+          `).join('');
+        } else {
+          newsContainer.innerHTML = "<p>No news found for your query.</p>";
+        }
+      } catch (error) {
+        newsContainer.innerHTML = "<p>Failed to fetch news. Please try again later.</p>";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
